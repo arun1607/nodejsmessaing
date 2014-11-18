@@ -20,9 +20,11 @@ Import the project in eclipse and start java application with main file "RabbitQ
 
 open browser and point to 
 
-http://localhost:3000/send/<message>
+http://localhost:3000/send/message
 
-Any text provided in <message> will be sent to messaging queue and will be read by java client.
+Any text provided in place of message will be sent to messaging queue and will be read by java client.
+
+i.e. http://localhost:3000/send/hello will send "hello" to messaging queue.
 
 There must me Rabbit MQ running on localhost on default port.
 
