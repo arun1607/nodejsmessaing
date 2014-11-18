@@ -1,0 +1,15 @@
+{
+  "name": "rabbitq-exmaple",
+  "version": "1.0.0",
+  "description": "",
+  "main": "sender.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "amqp": "^0.1.3",
+    "restify": "^2.8.3"
+  },
+  "author": "",
+  "license": "ISC"
+}
