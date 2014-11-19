@@ -14,14 +14,19 @@ var messageSender = new MessageSender();
 connection.on('ready', function () {
     connection.queue('myqueue', {'durable': true, 'autoDelete': false}, function (q) {
         this.MessageSender.prototype.sendMessage = function(queueName, message) {
-            connection.publish(queueName, message);
+            connection.publish(queueName, message, {contentType:'application/json',
+                headers:{
+                    type:'range'
+                }
+            });
         };
     }.bind({MessageSender: this.MessageSender}));
 }.bind({MessageSender: MessageSender}));
 
 
 function sendMessage(req, res) {
-    messageSender.sendMessage("myqueue",req.params.message);
+    var message = {msg : req.params.message,age : 23};
+    messageSender.sendMessage("myqueue",JSON.stringify(message));
     res.send("Message sent " + req.params.message);
 }
 

@@ -1,5 +1,6 @@
 package com.spring.config;
 
+import com.spring.learning.MyMessage;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -12,12 +13,17 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar;
+import org.springframework.amqp.support.converter.DefaultClassMapper;
+import org.springframework.amqp.support.converter.JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConversionException;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by amits on 17/11/14.
@@ -38,17 +44,7 @@ public class RabbitConfiguration
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory() {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory());
-        factory.setMessageConverter(new MessageConverter() {
-            @Override
-            public Message toMessage(Object o, MessageProperties messageProperties) throws MessageConversionException {
-                return null;
-            }
-
-            @Override
-            public Object fromMessage(Message message) throws MessageConversionException {
-                return new String(message.getBody());
-            }
-        });
+        factory.setMessageConverter(messageConverter());
         factory.setConcurrentConsumers(3);
         factory.setMaxConcurrentConsumers(10);
         return factory;
@@ -66,5 +62,19 @@ public class RabbitConfiguration
         return new Queue("myqueue");
     }
 
+    @Bean
+    public MessageConverter messageConverter(){
+        JsonMessageConverter jsonMessageConverter = new JsonMessageConverter();
+        jsonMessageConverter.setClassMapper(typeMapper());
+        return jsonMessageConverter;
+    }
 
+    @Bean
+    public TypeMapper typeMapper() {
+        TypeMapper typeMapper = new TypeMapper();
+        Map<String, Class<?>> idClassMapping = new HashMap<String, Class<?>>();
+        idClassMapping.put("range", MyMessage.class);
+        typeMapper.setIdClassMapping(idClassMapping);
+        return typeMapper;
+    }
 }
