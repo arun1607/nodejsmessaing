@@ -8,21 +8,22 @@ var server = restify.createServer();
 var connection = amqp.createConnection({host: 'localhost'});
 var MessageSender = function () {
 };
-var messageSender = new MessageSender();
 
 
+var queueConnectionCallback = function(queue) {
+    MessageSender.prototype.sendMessage = function(queueName, message) {
+        connection.publish(queueName, message, {contentType:'application/json',
+            headers:{
+                type:'range'
+            }
+        });
+    };
+};
 connection.on('ready', function () {
-    connection.queue('myqueue', {'durable': true, 'autoDelete': false}, function (q) {
-        this.MessageSender.prototype.sendMessage = function(queueName, message) {
-            connection.publish(queueName, message, {contentType:'application/json',
-                headers:{
-                    type:'range'
-                }
-            });
-        };
-    }.bind({MessageSender: this.MessageSender}));
-}.bind({MessageSender: MessageSender}));
+    connection.queue('myqueue', {'durable': true, 'autoDelete': false}, queueConnectionCallback);
+});
 
+var messageSender = new MessageSender();
 
 function sendMessage(req, res) {
     var message = {msg : req.params.message,age : 23};
